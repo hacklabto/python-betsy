@@ -10,7 +10,7 @@ import sys
 import socket
 from time import time, sleep
 
-from betsy import CommandSocket
+from betsy.protocol import CommandSocket
 
 
 if __name__ == '__main__':
