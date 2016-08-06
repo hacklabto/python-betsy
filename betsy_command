@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+
+"""
+Send commands to Betsy modules
+
+Copyright (c) 2016 Peter McCormick.
+"""
+
+import sys
+import socket
+from time import time, sleep
+
+from betsy import CommandSocket
+
+
+if __name__ == '__main__':
+    RECV_PERIOD = 0.250  # 250 ms
+
+    if len(sys.argv) < 4:
+        print("usage: %s ifdev address command" % (sys.argv[0], ), file=sys.stderr)
+        print("(if in doubt, try: %s eth0 'ff02::1' buildstamp    (assuming eth0 is your interface)" % (sys.argv[0], ), file=sys.stderr)
+        sys.exit(1)
+
+    ifdev = sys.argv[1]
+    addr = sys.argv[2]
+    command = sys.argv[3]
+
+    csock = CommandSocket(ifdev)
+
+    destaddr = csock.get_ipv6_addr_info(addr)
+
+    print("Sending: %s" % (command, ), file=sys.stderr)
+    csock.send_commands(command, destaddr)
+
+    now = start = time()
+    stop = start + RECV_PERIOD
+    remaining = RECV_PERIOD
+
+    num_replies = 0
+
+    while now < stop:
+        try:
+            (data, addr) = csock.recvfrom(timeout=remaining)
+        except socket.timeout:
+            break
+
+        print("[%s] :: %r" % (addr[0], data))
+        num_replies += 1
+
+        now = time()
+        remaining = stop - now
+
+    print("Received %d replies" % (num_replies, ), file=sys.stderr)
