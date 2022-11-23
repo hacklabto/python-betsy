@@ -6,8 +6,8 @@ A Python package for interacting with the Betsy LED display.
 
 test.py is new code I wrote to use PIL to generate some images. In particular:
 
-**send_reset()**  -- Call this once when each panel boots up, as they boot up in bootloader mode and need to be switched to firmware mode
-**send_sn_image()** --This reads the inventory, generates a picture of the serial, and sends it to that address. This is the original intention of my hacking.
+* **`send_reset()`**  -- Call this once when each panel boots up, as they boot up in bootloader mode and need to be switched to firmware mode
+* **`send_sn_image()`** --This reads the inventory, generates a picture of the serial, and sends it to that address. This is the original intention of my hacking.
 
 
 
