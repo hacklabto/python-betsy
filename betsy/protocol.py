@@ -22,7 +22,9 @@ class CommandSocket(object):
         self._sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
 
     def get_ipv6_addr_info(self, addr):
-        addrinfo = socket.getaddrinfo(addr + '%' + self._ifdev, self.UDP_PORT, socket.AF_INET6, socket.SOCK_DGRAM)
+        if self._ifdev != "":
+            addr = addr + '%' + self._ifdev
+        addrinfo = socket.getaddrinfo(addr, self.UDP_PORT, socket.AF_INET6, socket.SOCK_DGRAM)
         assert len(addrinfo) == 1
         return addrinfo[0][4]
 
