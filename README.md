@@ -23,5 +23,3 @@ And send gifs ( in a loop! ) -- This is just above, but parsing the frames from 
 while 1:
   handle_gif("./nyan.gif",0.025)
 ```
-
-Finally, there's some TK stuff I used for visualization when writing this stuff at home, but it's not really useful anymore, and will be removed shortly.
