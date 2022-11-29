@@ -1,3 +1,4 @@
+#!/bin/env python3
 
 from PIL import Image,ImageDraw
 import json
@@ -18,6 +19,7 @@ sn_to_ip = {}
 for x in inventory["inventory"]:
   sn_to_ip[ x["serial_number"] ] = x["ipv6_link_local"]
 
+netInt="wlp3s0"
 
 
 # Tile images returns a 2d array of an input image split into tiles of given size.
@@ -51,7 +53,7 @@ def tile_img(img, tilesize=18, matrix_dims=[9,6], crop=False):
 def serial_img(sn, i=255, j=0):
   image1 = Image.new("RGB", tile_size, (0, 0, 0))
   draw = ImageDraw.Draw(image1)
-  draw.text([2,6],sn,fill=(i, j, 0), align=CENTER)
+  draw.text([2,6],sn,fill=(i, j, 0), align='CENTER')
   return image1
 
 
@@ -77,7 +79,7 @@ def send_raw_img(csock, img, destaddr):
 
 # Simple function to send the Serial number to each panel:
 def send_sn_image(inv=inventory):
- csock = CommandSocket("wlp3s0")
+ csock = CommandSocket(netInt)
  # Note -- This is a little silly. Should probably just use `for i in inv["inventory"]` and ignore the mapping.
  # But this allows us to do the fun gradient.
  for i in range(len(inv["mapping"])):
@@ -93,7 +95,7 @@ def send_sn_image(inv=inventory):
 
 # Sends an image array
 def send_images(imgs, inv=inventory):
- csock = CommandSocket("wlp3s0")
+ csock = CommandSocket(netInt)
  for i in range(len(inv["mapping"])):
    for j in range(len(inv["mapping"][i])):
     sn=inv["mapping"][i][j]
@@ -105,7 +107,7 @@ def send_images(imgs, inv=inventory):
 
 # Simple function to send the Serial number to each panel:
 def send_reset(inv=inventory):
- csock = CommandSocket("wlp3s0")
+ csock = CommandSocket(netInt)
  for i in range(len(inv["mapping"])):
    for j in range(len(inv["mapping"][i])):
     sn=inv["mapping"][i][j]
@@ -134,7 +136,7 @@ def handle_gif(filename, sleep=0.25):
 #time.sleep(3)
 
 # Call this to call the SNs to the screen and ensure they're in the right order
-send_sn_image() 
+send_sn_image()
 
 # Here, draw a picture!
 img = Image.open("nyan2.jpg")
