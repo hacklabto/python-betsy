@@ -118,22 +118,22 @@ def send_reset(inv=inventory):
 
 
 
-def handle_gif(imageObject, sleep=0.25, loopcount=1):
-  if imageObject.info['duration'] >= 0:
-    sleep=imageObject.info['duration']/1000
+def handle_gif(imageObject, loopcount=1):
 
   for loopi in range(0, loopcount):
     # Display individual frames from the loaded animated GIF file
     for frame in range(0,imageObject.n_frames):
         d0 = datetime.datetime.now().microsecond
         imageObject.seek(frame)
+        sleep = imageObject.info['duration']/1000
 
         new_im = Image.new("RGB", imageObject.size)
         new_im.paste(imageObject)
         hl = tile_img(new_im, 18, crop=False) # False = scale.
         send_images(hl)
         dused = (datetime.datetime.now().microsecond - d0)/1000/1000
-        time.sleep(sleep - dused)
+        realsleep = sleep - dused if sleep - dused > 0 else 0.1
+        time.sleep(realsleep)
 
 
 
@@ -164,11 +164,12 @@ pathPrefix = 'image/'
 while 1:
   files = os.listdir(pathPrefix)
   for file in files:
-    imgPath = pathPrefix + file;
-    imageObject = Image.open(imgPath)
-    if getattr(imageObject, "is_animated", False):
-      handle_gif(imageObject,0.025, 3)
-    else:
-      # Comment out for GIF ONLY MODE.
-      # handle_image(imgPath, 5)
-      time.sleep(0.001)
+    if file not in ['.DS_Store']:
+      imgPath = pathPrefix + file;
+      imageObject = Image.open(imgPath)
+      if getattr(imageObject, "is_animated", False):
+        handle_gif(imageObject, 1)
+      else:
+        # Comment out for GIF ONLY MODE.
+        # handle_image(imgPath, 5)
+        time.sleep(0.001)
