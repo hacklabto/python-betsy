@@ -3,6 +3,7 @@
 from PIL import Image,ImageDraw
 import json
 import io
+import os
 from numpy import tile
 from betsy.protocol import CommandSocket
 from itertools import product
@@ -117,35 +118,57 @@ def send_reset(inv=inventory):
 
 
 
-def handle_gif(filename, sleep=0.25):
-  imageObject = Image.open(filename)
+def handle_gif(imageObject, sleep=0.25, loopcount=1):
   if imageObject.info['duration'] >= 0:
     sleep=imageObject.info['duration']/1000
 
-  # Display individual frames from the loaded animated GIF file
-  for frame in range(0,imageObject.n_frames):
-      d0 = datetime.datetime.now().microsecond
-      imageObject.seek(frame)
+  for loopi in range(0, loopcount):
+    # Display individual frames from the loaded animated GIF file
+    for frame in range(0,imageObject.n_frames):
+        d0 = datetime.datetime.now().microsecond
+        imageObject.seek(frame)
 
-      new_im = Image.new("RGB", imageObject.size)
-      new_im.paste(imageObject)
-      hl = tile_img(new_im, 18, crop=False) # False = scale.
-      send_images(hl)
-      dused = (datetime.datetime.now().microsecond - d0)/1000/1000
-      time.sleep(sleep - dused)
+        new_im = Image.new("RGB", imageObject.size)
+        new_im.paste(imageObject)
+        hl = tile_img(new_im, 18, crop=False) # False = scale.
+        send_images(hl)
+        dused = (datetime.datetime.now().microsecond - d0)/1000/1000
+        time.sleep(sleep - dused)
+
+
+
+def handle_image(imageObject, displaytime=5):
+  # Potentially uncessary
+  new_im = Image.new("RGB", imageObject.size)
+  new_im.paste(imageObject)
+  # Potentially uncessary
+
+  hl = tile_img(new_im, 18, crop=False) # False = scale.
+  send_images(hl)
+  time.sleep(displaytime)
 
 
 ### Use to reset on bootup; call just once:
-# send_reset()
+send_reset()
 #time.sleep(3)
 
 # Call this to call the SNs to the screen and ensure they're in the right order
 send_sn_image()
 
 # Here, draw a picture!
-img = Image.open("nyan2.jpg")
-hl = tile_img(img, 18, crop=False) # False = scale.
+# img = Image.open("nyan2.jpg")
+# hl = tile_img(img, 18, crop=False) # False = scale.
 #send_images(hl)
 
+pathPrefix = 'image/'
 while 1:
-  handle_gif("./nyan.gif",0.025)
+  files = os.listdir(pathPrefix)
+  for file in files:
+    imgPath = pathPrefix + file;
+    imageObject = Image.open(imgPath)
+    if getattr(imageObject, "is_animated", False):
+      handle_gif(imageObject,0.025, 3)
+    else:
+      # Comment out for GIF ONLY MODE.
+      # handle_image(imgPath, 5)
+      time.sleep(0.001)
