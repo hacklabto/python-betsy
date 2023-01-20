@@ -13,13 +13,13 @@ from PIL import GifImagePlugin
 f = open('inventory.json')
 inventory = json.load(f)
 tile_size = inventory["settings"]["dimensions"]
-dims = [  len(inventory["mapping"][0]), len(inventory["mapping"]) ] 
+dims = [  len(inventory["mapping"][0]), len(inventory["mapping"]) ]
 
 sn_to_ip = {}
 for x in inventory["inventory"]:
   sn_to_ip[ x["serial_number"] ] = x["ipv6_link_local"]
 
-netInt="wlp3s0"
+netInt="en0"
 
 
 # Tile images returns a 2d array of an input image split into tiles of given size.
@@ -33,7 +33,7 @@ def tile_img(img, tilesize=18, matrix_dims=[9,6], crop=False):
       img = img.resize((tilesize*matrix_dims[0],tilesize*matrix_dims[1]))
 
     w, h = img.size
-    imgs = []  
+    imgs = []
     grid = product(range(0, h-h%tilesize, tilesize), range(0, w-w%tilesize, tilesize))
     for i, j in grid:
         idx_i = int(i/tilesize)
@@ -118,12 +118,11 @@ def send_reset(inv=inventory):
 
 def handle_gif(filename, sleep=0.25):
   imageObject = Image.open(filename)
+
   # Display individual frames from the loaded animated GIF file
   for frame in range(0,imageObject.n_frames):
       imageObject.seek(frame)
 
-      mypalette = imageObject.getpalette()
-      imageObject.putpalette(mypalette)
       new_im = Image.new("RGB", imageObject.size)
       new_im.paste(imageObject)
       hl = tile_img(new_im, 18, crop=False) # False = scale.
@@ -132,7 +131,7 @@ def handle_gif(filename, sleep=0.25):
 
 
 ### Use to reset on bootup; call just once:
-#send_reset()
+# send_reset()
 #time.sleep(3)
 
 # Call this to call the SNs to the screen and ensure they're in the right order
