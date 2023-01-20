@@ -8,6 +8,7 @@ from betsy.protocol import CommandSocket
 from itertools import product
 import time
 from PIL import GifImagePlugin
+import datetime
 
 # Opening JSON file
 f = open('inventory.json')
@@ -123,13 +124,15 @@ def handle_gif(filename, sleep=0.25):
 
   # Display individual frames from the loaded animated GIF file
   for frame in range(0,imageObject.n_frames):
+      d0 = datetime.datetime.now().microsecond
       imageObject.seek(frame)
 
       new_im = Image.new("RGB", imageObject.size)
       new_im.paste(imageObject)
       hl = tile_img(new_im, 18, crop=False) # False = scale.
       send_images(hl)
-      time.sleep(sleep)
+      dused = (datetime.datetime.now().microsecond - d0)/1000/1000
+      time.sleep(sleep - dused)
 
 
 ### Use to reset on bootup; call just once:
