@@ -4,6 +4,7 @@ from PIL import Image,ImageDraw
 import json
 import io
 import os
+import random
 from numpy import tile
 from betsy.protocol import CommandSocket
 from itertools import product
@@ -118,25 +119,22 @@ def send_reset(inv=inventory):
 
 
 
-def handle_gif(imageObject, duration=10):
+def handle_gif(imageObject, duration=5):
   # TODO: Duration is time to play each gif in seconds, rather than loops
   timetot = 0
   while timetot < duration:
     # Display individual frames from the loaded animated GIF file
     for frame in range(0,imageObject.n_frames):
-        d0 = datetime.datetime.now().microsecond
         imageObject.seek(frame)
         sleep = imageObject.info['duration']/1000
-
+        sleep = sleep if sleep > 0 else 0.16
         new_im = Image.new("RGB", imageObject.size)
         new_im.paste(imageObject)
         hl = tile_img(new_im, 18, crop=False) # False = scale.
         send_images(hl)
-        dused = (datetime.datetime.now().microsecond - d0)/1000/1000
-        realsleep = sleep - dused if sleep - dused > 0 else 0.1
-        timetot+= realsleep + dused
-        print(timetot)
-        time.sleep(realsleep)
+
+        timetot+= sleep
+        time.sleep(sleep)
 
 
 
@@ -167,11 +165,12 @@ send_sn_image()
 pathPrefix = 'image/'
 while 1:
   files = os.listdir(pathPrefix)
+  random.shuffle(files)
   for file in files:
     if file not in ['.DS_Store']:
       imgPath = pathPrefix + file;
       imageObject = Image.open(imgPath)
-      if getattr(imageObject, "is_animated", False):
+      if getattr(imageObject, "is_animated", True):
         handle_gif(imageObject)
       else:
         # Comment out for GIF ONLY MODE.
