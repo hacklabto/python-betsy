@@ -118,6 +118,8 @@ def send_reset(inv=inventory):
 
 def handle_gif(filename, sleep=0.25):
   imageObject = Image.open(filename)
+  if imageObject.info['duration'] >= 0:
+    sleep=imageObject.info['duration']/1000
 
   # Display individual frames from the loaded animated GIF file
   for frame in range(0,imageObject.n_frames):
