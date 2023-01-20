@@ -118,9 +118,10 @@ def send_reset(inv=inventory):
 
 
 
-def handle_gif(imageObject, loopcount=1):
-
-  for loopi in range(0, loopcount):
+def handle_gif(imageObject, duration=10):
+  # TODO: Duration is time to play each gif in seconds, rather than loops
+  timetot = 0
+  while timetot < duration:
     # Display individual frames from the loaded animated GIF file
     for frame in range(0,imageObject.n_frames):
         d0 = datetime.datetime.now().microsecond
@@ -133,7 +134,10 @@ def handle_gif(imageObject, loopcount=1):
         send_images(hl)
         dused = (datetime.datetime.now().microsecond - d0)/1000/1000
         realsleep = sleep - dused if sleep - dused > 0 else 0.1
+        timetot+= realsleep
+        print(timetot)
         time.sleep(realsleep)
+
 
 
 
@@ -168,7 +172,7 @@ while 1:
       imgPath = pathPrefix + file;
       imageObject = Image.open(imgPath)
       if getattr(imageObject, "is_animated", False):
-        handle_gif(imageObject, 1)
+        handle_gif(imageObject)
       else:
         # Comment out for GIF ONLY MODE.
         # handle_image(imgPath, 5)
