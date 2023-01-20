@@ -134,7 +134,7 @@ def handle_gif(imageObject, duration=10):
         send_images(hl)
         dused = (datetime.datetime.now().microsecond - d0)/1000/1000
         realsleep = sleep - dused if sleep - dused > 0 else 0.1
-        timetot+= realsleep
+        timetot+= realsleep + dused
         print(timetot)
         time.sleep(realsleep)
 
