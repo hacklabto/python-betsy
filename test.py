@@ -168,8 +168,13 @@ send_sn_image()
 #   imageObject = Image.open('rainbow.gif')
 #   handle_gif(imageObject)
 
-pathPrefix = 'image/'
+# Comment out as you want to configure it.
+# subdir = 'test/'
+subdir = 'cool/'
+# subdir = 'meme/'
+pathPrefix = 'image/' + subdir
 while 1:
+  send_reset()
   files = os.listdir(pathPrefix)
   random.shuffle(files)
   for file in files:
