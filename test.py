@@ -22,7 +22,7 @@ sn_to_ip = {}
 for x in inventory["inventory"]:
   sn_to_ip[ x["serial_number"] ] = x["ipv6_link_local"]
 
-netInt="en0"
+netInt="en10"
 
 
 # Tile images returns a 2d array of an input image split into tiles of given size.
@@ -70,7 +70,7 @@ def send_raw_img(csock, img, destaddr):
 
     img_byte_arr = img.tobytes("raw", "RGB")
 
-    # Here we pad 8bit RGB to 16 bit; note we're loosing the top half of the byte so we can't drive full brightness:
+    # Here we pad 8bit RGB to 16 bit; note we're losing the top half of the byte so we can't drive full brightness:
     img2 = [0]*1944
     for x in range(972):
       img2[x*2] = img_byte_arr[x]
@@ -151,10 +151,12 @@ def handle_image(imageObject, displaytime=5):
 
 
 ### Use to reset on bootup; call just once:
+print("Sending Reset")
 send_reset()
-#time.sleep(3)
+# time.sleep(3)
 
 # Call this to call the SNs to the screen and ensure they're in the right order
+print("Sending Serial Numbers")
 send_sn_image()
 
 # Here, draw a picture!
@@ -162,13 +164,17 @@ send_sn_image()
 # hl = tile_img(img, 18, crop=False) # False = scale.
 #send_images(hl)
 
+# while 1:
+#   imageObject = Image.open('rainbow.gif')
+#   handle_gif(imageObject)
+
 pathPrefix = 'image/'
 while 1:
   files = os.listdir(pathPrefix)
   random.shuffle(files)
   for file in files:
-    if file not in ['.DS_Store']:
-      imgPath = pathPrefix + file;
+    if (not file.__contains__("DS_Store")):
+      imgPath = pathPrefix + file
       imageObject = Image.open(imgPath)
       if getattr(imageObject, "is_animated", True):
         handle_gif(imageObject)
