@@ -22,7 +22,7 @@ sn_to_ip = {}
 for x in inventory["inventory"]:
   sn_to_ip[ x["serial_number"] ] = x["ipv6_link_local"]
 
-netInt="en10"
+netInt="enp1s0"
 
 
 # Tile images returns a 2d array of an input image split into tiles of given size.
@@ -125,6 +125,7 @@ def handle_gif(imageObject, duration=5):
   while timetot < duration:
     # Display individual frames from the loaded animated GIF file
     for frame in range(0,imageObject.n_frames):
+        start_time = datetime.datetime.now()
         imageObject.seek(frame)
         sleep = imageObject.info['duration']/1000
         sleep = sleep if sleep > 0 else 0.16
@@ -132,9 +133,12 @@ def handle_gif(imageObject, duration=5):
         new_im.paste(imageObject)
         hl = tile_img(new_im, 18, crop=False) # False = scale.
         send_images(hl)
-
-        timetot+= sleep
-        time.sleep(sleep)
+        timetot += sleep
+        end_time = datetime.datetime.now()
+        diff = end_time - start_time
+        actual_sleep = sleep - diff.total_seconds()
+        if actual_sleep > 0:
+            time.sleep(actual_sleep)
 
 
 
