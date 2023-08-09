@@ -22,7 +22,7 @@ sn_to_ip = {}
 for x in inventory["inventory"]:
   sn_to_ip[ x["serial_number"] ] = x["ipv6_link_local"]
 
-netInt="en10"
+netInt="enp1s0"
 
 
 # Tile images returns a 2d array of an input image split into tiles of given size.
